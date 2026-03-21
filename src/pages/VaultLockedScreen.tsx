@@ -43,7 +43,7 @@ export default function VaultLockedScreen() {
 
   useEffect(() => {
     if (phase === 'unlocked') {
-      const t = setTimeout(() => navigate('/'), 1200);
+      const t = setTimeout(() => navigate('/vault'), 1200);
       return () => clearTimeout(t);
     }
   }, [phase, navigate]);
