@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Search, Shield } from "lucide-react";
 import { motion } from "framer-motion";
-import type { PasswordEntry, CryptoKey } from "@/lib/password-store";
+import type { PasswordEntry } from "@/lib/password-store";
 import { CATEGORIES, evaluateStrength, getDemoPasswords, getDemoKeys } from "@/lib/password-store";
 import Sidebar from "./Sidebar";
 import PasswordCard from "./PasswordCard";
