@@ -14,7 +14,6 @@ type View = 'vault' | 'favorites' | 'settings' | 'generator';
 export default function VaultDashboard() {
   const [entries, setEntries] = useState<PasswordEntry[]>(getDemoPasswords);
   const [view, setView] = useState<View>('vault');
-  const [view, setView] = useState<View>('vault');
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [modalOpen, setModalOpen] = useState(false);

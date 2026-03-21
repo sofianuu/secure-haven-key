@@ -51,7 +51,7 @@ export default function Sidebar({ activeView, onViewChange, onAddNew, counts }: 
       <nav className="flex-1 px-3 py-2 space-y-1">
         {navItems.map((item) => {
           const isActive = activeView === item.view;
-          const count = item.view === 'vault' ? counts.total : item.view === 'favorites' ? counts.favorites : item.view === 'wallet' ? counts.keys : null;
+          const count = item.view === 'vault' ? counts.total : item.view === 'favorites' ? counts.favorites : null;
           return (
             <button
               key={item.view}
