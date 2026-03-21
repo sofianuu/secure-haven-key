@@ -19,40 +19,27 @@ const navItems: { view: View; label: string; icon: typeof Shield }[] = [
 ];
 
 export default function Sidebar({ activeView, onViewChange, onAddNew, counts }: SidebarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
   const handleNav = (view: View) => {
     onViewChange(view);
-    setMobileOpen(false);
   };
 
-  const handleAdd = () => {
-    onAddNew();
-    setMobileOpen(false);
-  };
-
-  const sidebarContent = (
+  const desktopContent = (
     <>
       {/* Logo */}
-      <div className="p-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 glow-border flex items-center justify-center">
-            <Shield className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-base font-semibold tracking-tight text-foreground">KeyForge</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Vault</p>
-          </div>
+      <div className="p-6 flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-primary/10 glow-border flex items-center justify-center">
+          <Shield className="w-5 h-5 text-primary" />
         </div>
-        <button onClick={() => setMobileOpen(false)} className="md:hidden p-1.5 rounded-lg hover:bg-secondary transition-colors">
-          <X className="w-5 h-5 text-muted-foreground" />
-        </button>
+        <div>
+          <h1 className="text-base font-semibold tracking-tight text-foreground">KeyForge</h1>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Vault</p>
+        </div>
       </div>
 
       {/* Add button */}
       <div className="px-4 mb-2">
         <button
-          onClick={handleAdd}
+          onClick={onAddNew}
           className="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium glow-border"
         >
           <Plus className="w-4 h-4" />
@@ -107,47 +94,47 @@ export default function Sidebar({ activeView, onViewChange, onAddNew, counts }: 
 
   return (
     <>
-      {/* Mobile header bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center justify-between px-4 bg-card/80 backdrop-blur-md border-b border-border">
-        <div className="flex items-center gap-2.5">
-          <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg hover:bg-secondary transition-colors">
-            <Menu className="w-5 h-5 text-foreground" />
+      {/* Mobile bottom nav */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/90 backdrop-blur-xl border-t border-border safe-bottom">
+        <div className="flex items-center justify-around px-2 pt-2 pb-3">
+          {navItems.map((item) => {
+            const isActive = activeView === item.view;
+            return (
+              <button
+                key={item.view}
+                onClick={() => handleNav(item.view)}
+                className="relative flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all"
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="mobile-tab-indicator"
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-primary"
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                )}
+                <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`text-[10px] transition-colors ${isActive ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+          {/* FAB-style add button */}
+          <button
+            onClick={onAddNew}
+            className="flex flex-col items-center gap-1 px-3 py-1.5"
+          >
+            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center glow-primary -mt-5 shadow-lg">
+              <Plus className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="text-[10px] text-primary font-medium -mt-0.5">Add</span>
           </button>
-          <Shield className="w-5 h-5 text-primary" />
-          <span className="text-sm font-semibold text-foreground">KeyForge</span>
         </div>
-        <button onClick={onAddNew} className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
-          <Plus className="w-5 h-5" />
-        </button>
       </div>
-
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="md:hidden fixed inset-0 z-50 bg-background/60 backdrop-blur-sm"
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="md:hidden fixed top-0 left-0 bottom-0 z-50 w-72 flex flex-col bg-card border-r border-border"
-            >
-              {sidebarContent}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-64 h-screen flex-col border-r border-border bg-card/50 backdrop-blur-sm">
-        {sidebarContent}
+        {desktopContent}
       </aside>
     </>
   );
