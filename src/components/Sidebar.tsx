@@ -14,8 +14,8 @@ interface SidebarProps {
 const navItems: { view: View; label: string; icon: typeof Shield }[] = [
   { view: 'vault', label: 'Vault', icon: LayoutGrid },
   { view: 'favorites', label: 'Favorites', icon: Star },
-  { view: 'wallet', label: 'Wallet', icon: Wallet },
   { view: 'generator', label: 'Generator', icon: Key },
+  { view: 'settings', label: 'Settings', icon: Settings },
 ];
 
 export default function Sidebar({ activeView, onViewChange, onAddNew, counts }: SidebarProps) {

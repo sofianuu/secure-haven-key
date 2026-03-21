@@ -142,7 +142,7 @@ export default function VaultDashboard() {
             </>
           )}
 
-          {view === 'wallet' && <WalletView keys={keys} />}
+          {view === 'settings' && <SettingsView />}
           {view === 'generator' && <PasswordGenerator />}
         </div>
       </main>
