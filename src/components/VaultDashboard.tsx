@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Search, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import type { PasswordEntry } from "@/lib/password-store";
-import { CATEGORIES, evaluateStrength, getDemoPasswords, getDemoKeys } from "@/lib/password-store";
+import { CATEGORIES, evaluateStrength, getDemoPasswords } from "@/lib/password-store";
 import Sidebar from "./Sidebar";
 import PasswordCard from "./PasswordCard";
 import AddEditModal from "./AddEditModal";
