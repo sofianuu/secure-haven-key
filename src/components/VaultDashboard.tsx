@@ -9,7 +9,7 @@ import AddEditModal from "./AddEditModal";
 import PasswordGenerator from "./PasswordGenerator";
 import SettingsView from "./SettingsView";
 
-type View = 'vault' | 'favorites' | 'wallet' | 'generator';
+type View = 'vault' | 'favorites' | 'settings' | 'generator';
 
 export default function VaultDashboard() {
   const [entries, setEntries] = useState<PasswordEntry[]>(getDemoPasswords);
