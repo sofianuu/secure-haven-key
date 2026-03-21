@@ -57,7 +57,7 @@ export default function VaultDashboard() {
   const counts = {
     total: entries.length,
     favorites: entries.filter((e) => e.favorite).length,
-    keys: keys.length,
+    keys: 0,
   };
 
   return (
