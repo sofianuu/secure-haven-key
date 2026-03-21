@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Shield, Key, Wallet, Star, LayoutGrid, Plus, Lock, Menu, X } from "lucide-react";
+import { Shield, Key, Settings, Star, LayoutGrid, Plus, Lock, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type View = 'vault' | 'favorites' | 'wallet' | 'generator';
+type View = 'vault' | 'favorites' | 'settings' | 'generator';
 
 interface SidebarProps {
   activeView: View;
@@ -14,8 +14,8 @@ interface SidebarProps {
 const navItems: { view: View; label: string; icon: typeof Shield }[] = [
   { view: 'vault', label: 'Vault', icon: LayoutGrid },
   { view: 'favorites', label: 'Favorites', icon: Star },
-  { view: 'wallet', label: 'Wallet', icon: Wallet },
   { view: 'generator', label: 'Generator', icon: Key },
+  { view: 'settings', label: 'Settings', icon: Settings },
 ];
 
 export default function Sidebar({ activeView, onViewChange, onAddNew, counts }: SidebarProps) {
@@ -51,7 +51,7 @@ export default function Sidebar({ activeView, onViewChange, onAddNew, counts }: 
       <nav className="flex-1 px-3 py-2 space-y-1">
         {navItems.map((item) => {
           const isActive = activeView === item.view;
-          const count = item.view === 'vault' ? counts.total : item.view === 'favorites' ? counts.favorites : item.view === 'wallet' ? counts.keys : null;
+          const count = item.view === 'vault' ? counts.total : item.view === 'favorites' ? counts.favorites : null;
           return (
             <button
               key={item.view}

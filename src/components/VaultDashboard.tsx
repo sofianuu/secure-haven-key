@@ -1,19 +1,18 @@
 import { useState, useMemo } from "react";
 import { Search, Shield } from "lucide-react";
 import { motion } from "framer-motion";
-import type { PasswordEntry, CryptoKey } from "@/lib/password-store";
-import { CATEGORIES, evaluateStrength, getDemoPasswords, getDemoKeys } from "@/lib/password-store";
+import type { PasswordEntry } from "@/lib/password-store";
+import { CATEGORIES, evaluateStrength, getDemoPasswords } from "@/lib/password-store";
 import Sidebar from "./Sidebar";
 import PasswordCard from "./PasswordCard";
 import AddEditModal from "./AddEditModal";
 import PasswordGenerator from "./PasswordGenerator";
-import WalletView from "./WalletView";
+import SettingsView from "./SettingsView";
 
-type View = 'vault' | 'favorites' | 'wallet' | 'generator';
+type View = 'vault' | 'favorites' | 'settings' | 'generator';
 
 export default function VaultDashboard() {
   const [entries, setEntries] = useState<PasswordEntry[]>(getDemoPasswords);
-  const [keys] = useState<CryptoKey[]>(getDemoKeys);
   const [view, setView] = useState<View>('vault');
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -57,7 +56,7 @@ export default function VaultDashboard() {
   const counts = {
     total: entries.length,
     favorites: entries.filter((e) => e.favorite).length,
-    keys: keys.length,
+    keys: 0,
   };
 
   return (
@@ -142,7 +141,7 @@ export default function VaultDashboard() {
             </>
           )}
 
-          {view === 'wallet' && <WalletView keys={keys} />}
+          {view === 'settings' && <SettingsView />}
           {view === 'generator' && <PasswordGenerator />}
         </div>
       </main>
