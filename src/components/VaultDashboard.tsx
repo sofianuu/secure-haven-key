@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, SlidersHorizontal, Shield } from "lucide-react";
+import { Search, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import type { PasswordEntry, CryptoKey } from "@/lib/password-store";
 import { CATEGORIES, evaluateStrength, getDemoPasswords, getDemoKeys } from "@/lib/password-store";
@@ -64,17 +64,17 @@ export default function VaultDashboard() {
     <div className="flex h-screen bg-background bg-grid">
       <Sidebar activeView={view} onViewChange={setView} onAddNew={openAdd} counts={counts} />
 
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-4xl mx-auto p-8">
+      <main className="flex-1 overflow-auto pt-14 md:pt-0">
+        <div className="max-w-4xl mx-auto p-4 md:p-8">
           {(view === 'vault' || view === 'favorites') && (
             <>
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
                 <div>
-                  <h2 className="text-xl font-semibold text-foreground">
+                  <h2 className="text-lg md:text-xl font-semibold text-foreground">
                     {view === 'favorites' ? 'Favorites' : 'Password Vault'}
                   </h2>
-                  <p className="text-sm text-muted-foreground mt-0.5">
+                  <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
                     {filtered.length} credential{filtered.length !== 1 ? 's' : ''} stored securely
                   </p>
                 </div>
@@ -85,7 +85,7 @@ export default function VaultDashboard() {
               </div>
 
               {/* Search & Filter */}
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
                 <div className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-card border border-border focus-within:border-primary/30 transition-colors">
                   <Search className="w-4 h-4 text-muted-foreground" />
                   <input
@@ -96,10 +96,10 @@ export default function VaultDashboard() {
                     className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                   />
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                   <button
                     onClick={() => setFilterCategory('all')}
-                    className={`px-3 py-2 rounded-lg text-xs transition-all ${
+                    className={`px-3 py-2 rounded-lg text-xs transition-all whitespace-nowrap ${
                       filterCategory === 'all' ? 'bg-primary/10 text-primary border border-primary/30' : 'bg-card text-muted-foreground border border-border hover:border-primary/20'
                     }`}
                   >
@@ -109,7 +109,7 @@ export default function VaultDashboard() {
                     <button
                       key={cat.value}
                       onClick={() => setFilterCategory(cat.value)}
-                      className={`px-3 py-2 rounded-lg text-xs transition-all ${
+                      className={`px-3 py-2 rounded-lg text-xs transition-all whitespace-nowrap ${
                         filterCategory === cat.value ? 'bg-primary/10 text-primary border border-primary/30' : 'bg-card text-muted-foreground border border-border hover:border-primary/20'
                       }`}
                     >
@@ -121,7 +121,7 @@ export default function VaultDashboard() {
 
               {/* Grid */}
               {filtered.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   {filtered.map((entry, i) => (
                     <PasswordCard
                       key={entry.id}
