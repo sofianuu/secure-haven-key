@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import WelcomeScreen from "./pages/WelcomeScreen.tsx";
+import OnboardingScreen from "./pages/OnboardingScreen.tsx";
+import VaultLockedScreen from "./pages/VaultLockedScreen.tsx";
 
 const queryClient = new QueryClient();
 
@@ -15,7 +18,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<WelcomeScreen />} />
+          <Route path="/onboarding" element={<OnboardingScreen />} />
+          <Route path="/unlock" element={<VaultLockedScreen />} />
+          <Route path="/vault" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
