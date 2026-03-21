@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Shield, Key, Settings, Star, LayoutGrid, Plus, Lock, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type View = 'vault' | 'favorites' | 'wallet' | 'generator';
+type View = 'vault' | 'favorites' | 'settings' | 'generator';
 
 interface SidebarProps {
   activeView: View;
