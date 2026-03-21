@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 import PasswordCard from "./PasswordCard";
 import AddEditModal from "./AddEditModal";
 import PasswordGenerator from "./PasswordGenerator";
-import WalletView from "./WalletView";
+import SettingsView from "./SettingsView";
 
 type View = 'vault' | 'favorites' | 'wallet' | 'generator';
 
