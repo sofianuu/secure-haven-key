@@ -99,7 +99,11 @@
 }
 
 @layer base {
-  * {
+  html {
+    color-scheme: light dark;
+  }
+
+  *  {
     @apply border-border;
   }
 
