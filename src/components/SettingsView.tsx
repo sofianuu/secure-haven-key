@@ -98,6 +98,16 @@ export default function SettingsView() {
                       <div className="absolute right-0.5 top-0.5 w-5 h-5 rounded-full bg-primary shadow-sm" />
                     </div>
                   )}
+                  {item.action === 'theme' && (
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[11px] text-muted-foreground">{isDark ? 'Dark' : 'Light'}</span>
+                      <div className={`w-10 h-6 rounded-full relative transition-colors shrink-0 ${isDark ? 'bg-primary' : 'bg-muted'}`}>
+                        <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-background shadow-sm transition-transform ${isDark ? 'translate-x-[18px]' : 'translate-x-0.5'}`}>
+                          {isDark ? <Moon className="w-3 h-3 text-primary m-1" /> : <Sun className="w-3 h-3 text-muted-foreground m-1" />}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
