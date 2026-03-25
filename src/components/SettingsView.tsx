@@ -47,9 +47,14 @@ export default function SettingsView() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
 
+  const isDark = theme === 'dark';
+
   const handleAction = (label: string) => {
     if (label === 'Lock Vault') {
       navigate('/unlock');
+    }
+    if (label === 'Theme') {
+      setTheme(isDark ? 'light' : 'dark');
     }
   };
 
