@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Shield, Server, Fingerprint, Lock, LogOut, ChevronRight, Smartphone, Bell, Eye, Trash2 } from "lucide-react";
+import { Shield, Server, Fingerprint, Lock, LogOut, ChevronRight, Smartphone, Bell, Eye, Trash2, Sun, Moon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 
 interface SettingItem {
   icon: typeof Shield;
@@ -11,6 +12,12 @@ interface SettingItem {
 }
 
 const sections: { title: string; items: SettingItem[] }[] = [
+  {
+    title: 'Appearance',
+    items: [
+      { icon: Sun, label: 'Theme', desc: 'Switch between light and dark mode', action: 'theme' },
+    ],
+  },
   {
     title: 'Security',
     items: [
@@ -38,6 +45,7 @@ const sections: { title: string; items: SettingItem[] }[] = [
 
 export default function SettingsView() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
   const handleAction = (label: string) => {
     if (label === 'Lock Vault') {
