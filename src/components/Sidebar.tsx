@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Shield, Key, Settings, Star, LayoutGrid, Plus, Lock, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "./ThemeToggle";
+import { motion, AnimatePresence } from "framer-motion";
 
 type View = 'vault' | 'favorites' | 'settings' | 'generator';
 
