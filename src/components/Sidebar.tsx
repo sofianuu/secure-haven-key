@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Shield, Key, Settings, Star, LayoutGrid, Plus, Lock, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "./ThemeToggle";
 
 type View = 'vault' | 'favorites' | 'settings' | 'generator';
 
@@ -81,13 +82,16 @@ export default function Sidebar({ activeView, onViewChange, onAddNew, counts }: 
         })}
       </nav>
 
-      {/* Status */}
-      <div className="p-4 mx-3 mb-3 rounded-lg bg-secondary/50 border border-border">
-        <div className="flex items-center gap-2 mb-1">
-          <Lock className="w-3 h-3 text-success" />
-          <span className="text-xs font-medium text-success">Encrypted</span>
+      {/* Footer */}
+      <div className="px-4 mb-3 flex items-center justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <Lock className="w-3 h-3 text-success" />
+            <span className="text-xs font-medium text-success">Encrypted</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground">AES-256-GCM · Zero-knowledge</p>
         </div>
-        <p className="text-[10px] text-muted-foreground">AES-256-GCM · Zero-knowledge</p>
+        <ThemeToggle />
       </div>
     </>
   );
