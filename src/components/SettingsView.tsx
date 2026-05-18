@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Shield, Server, Fingerprint, Lock, LogOut, ChevronRight, Smartphone, Bell, Eye, Trash2, Sun, Moon } from "lucide-react";
+import { Shield, Server, Fingerprint, Lock, LogOut, ChevronRight, Smartphone, Bell, Eye, Trash2, Sun, Moon, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 
@@ -16,6 +16,12 @@ const sections: { title: string; items: SettingItem[] }[] = [
     title: 'Appearance',
     items: [
       { icon: Sun, label: 'Theme', desc: 'Switch between light and dark mode', action: 'theme' },
+    ],
+  },
+  {
+    title: 'Collaboration',
+    items: [
+      { icon: Building2, label: 'Organizations & Teams', desc: 'Shared vaults, RBAC, ECDH Team Keys', action: 'chevron' },
     ],
   },
   {
@@ -55,6 +61,9 @@ export default function SettingsView() {
     }
     if (label === 'Theme') {
       setTheme(isDark ? 'light' : 'dark');
+    }
+    if (label === 'Organizations & Teams') {
+      navigate('/organizations');
     }
   };
 
