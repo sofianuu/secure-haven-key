@@ -48,27 +48,55 @@ export default function Organizations() {
   const isOwner = activeOrg?.ownerId === me;
 
   return (
-    <div className="min-h-screen bg-background bg-grid text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b border-border/60 bg-card/40 backdrop-blur sticky top-0 z-30">
+      <header className="border-b border-border/60 bg-card/60 backdrop-blur sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center gap-3">
-          <button onClick={() => navigate("/vault")} className="p-2 rounded-lg hover:bg-secondary/60 transition-colors">
+          <button onClick={() => navigate("/vault")} className="p-2 -ml-2 rounded-lg hover:bg-secondary/60 transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center">
-            <Building2 className="w-4 h-4 text-primary" />
-          </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-semibold leading-none">Organizations & Teams</h1>
-            <p className="text-[11px] text-muted-foreground mt-1">Shared vaults · RBAC · ECDH-wrapped Team Keys</p>
+            <h1 className="text-sm font-semibold leading-none">Organizations</h1>
+            <p className="text-[11px] text-muted-foreground mt-1 truncate">Shared vaults & teams</p>
           </div>
           <IdentitySwitcher />
         </div>
       </header>
 
+      {/* Mobile selectors */}
+      <div className="lg:hidden border-b border-border/60 bg-card/30">
+        <div className="max-w-7xl mx-auto px-4 py-3 space-y-2">
+          <PickerRow
+            icon={Building2}
+            label="Organization"
+            items={myOrgs.map((o) => ({ id: o.id, name: o.name, badge: o.ownerId === me ? "owner" : undefined }))}
+            activeId={activeOrgId}
+            onPick={(id) => {
+              setActiveOrgId(id);
+              const org = orgs.find((o) => o.id === id);
+              setActiveTeamId(org?.teams[0]?.id ?? null);
+            }}
+            onAdd={() => setShowNewOrg(true)}
+          />
+          {activeOrg && (
+            <PickerRow
+              icon={Users}
+              label="Team"
+              items={activeOrg.teams
+                .filter((t) => getMyRole(t, me) || isOwner)
+                .map((t) => ({ id: t.id, name: t.name }))}
+              activeId={activeTeamId}
+              onPick={setActiveTeamId}
+              onAdd={isOwner || activeOrg.teams.some((t) => getMyRole(t, me) === "ORG_ADMIN") ? () => setShowNewTeam(true) : undefined}
+              emptyHint="No teams"
+            />
+          )}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-5 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-5">
-        {/* Org list */}
-        <aside className="space-y-2">
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:block space-y-2">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Organizations</h2>
             <button onClick={() => setShowNewOrg(true)} className="p-1.5 rounded-md hover:bg-secondary/60 text-primary">
@@ -118,7 +146,6 @@ export default function Organizations() {
                       }`}
                     >
                       <span className="text-sm truncate">{t.name}</span>
-                      <span className="text-[10px] text-muted-foreground font-mono">e{t.epoch}</span>
                     </button>
                   );
                 })}
@@ -168,11 +195,11 @@ export default function Organizations() {
                     }}
                   />
 
-                  <div className="flex items-center gap-1 mt-5 mb-4 border-b border-border">
+                  <div className="flex items-center gap-0 mt-5 mb-4 border-b border-border overflow-x-auto">
                     {(
                       [
                         ["shared", "Shared", Key],
-                        ["individual", "Individual", Lock],
+                        ["individual", "Personal", Lock],
                         ["members", "Members", Users],
                         ["audit", "Audit", ScrollText],
                       ] as const
@@ -180,7 +207,7 @@ export default function Organizations() {
                       <button
                         key={k}
                         onClick={() => setTab(k)}
-                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors -mb-px ${
+                        className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px whitespace-nowrap ${
                           tab === k
                             ? "border-primary text-primary"
                             : "border-transparent text-muted-foreground hover:text-foreground"
