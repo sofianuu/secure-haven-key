@@ -10,6 +10,7 @@ import WelcomeScreen from "./pages/WelcomeScreen.tsx";
 import OnboardingScreen from "./pages/OnboardingScreen.tsx";
 import VaultLockedScreen from "./pages/VaultLockedScreen.tsx";
 import AdminPanel from "./pages/AdminPanel.tsx";
+import Organizations from "./pages/Organizations.tsx";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/unlock" element={<VaultLockedScreen />} />
             <Route path="/vault" element={<Index />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/organizations" element={<Organizations />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
