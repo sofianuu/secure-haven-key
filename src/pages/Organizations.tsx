@@ -500,10 +500,10 @@ function MembersTab({ org, team, myRole }: { org: Organization; team: Team; myRo
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm flex items-center gap-2">
-                  <span className="font-mono">{member?.alias}</span>
+                  <span>{member?.alias}</span>
                   {isMe && <span className="text-[10px] text-primary">(you)</span>}
                 </p>
-                <p className="text-[10px] text-muted-foreground font-mono truncate">wrap: {m.wrappedKey.slice(0, 28)}…</p>
+                <p className="text-[10px] text-muted-foreground truncate">{ROLE_LABEL[m.role]}</p>
               </div>
               {canManage && roleOptions.length > 0 ? (
                 <select
@@ -512,12 +512,12 @@ function MembersTab({ org, team, myRole }: { org: Organization; team: Team; myRo
                   className="bg-secondary border border-border rounded px-1.5 py-1 text-[11px]"
                 >
                   {roleOptions.map((r) => (
-                    <option key={r} value={r}>{r}</option>
+                    <option key={r} value={r}>{ROLE_LABEL[r]}</option>
                   ))}
-                  {!roleOptions.includes(m.role) && <option value={m.role}>{m.role}</option>}
+                  {!roleOptions.includes(m.role) && <option value={m.role}>{ROLE_LABEL[m.role]}</option>}
                 </select>
               ) : (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${ROLE_COLORS[m.role]}`}>{m.role}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${ROLE_COLORS[m.role]}`}>{ROLE_LABEL[m.role]}</span>
               )}
               {(canManage || isMe) && (
                 <button
