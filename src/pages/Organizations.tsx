@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Building2, Plus, Users, Key, Trash2, Eye, EyeOff, Crown,
   UserPlus, Shield, ShieldCheck, ScrollText, RefreshCw, Link2, Lock, Pencil, X, Copy, Check,
+  MoreVertical, ChevronDown,
 } from "lucide-react";
 import {
   actions, useOrgsStore, getMyRole, memberAlias,
@@ -15,6 +16,12 @@ const ROLE_COLORS: Record<Role, string> = {
   TEAM_ADMIN: "bg-blue-500/15 text-blue-400 border-blue-500/30",
   MEMBER: "bg-muted text-foreground border-border",
   VIEWER: "bg-muted/50 text-muted-foreground border-border",
+};
+const ROLE_LABEL: Record<Role, string> = {
+  ORG_ADMIN: "Org admin",
+  TEAM_ADMIN: "Team admin",
+  MEMBER: "Member",
+  VIEWER: "Viewer",
 };
 
 export default function Organizations() {
