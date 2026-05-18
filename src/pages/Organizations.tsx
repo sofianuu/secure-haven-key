@@ -746,32 +746,43 @@ function CredentialRow({ org, team, cred, myRole }: { org: Organization; team: T
 
 function AuditTab({ orgId, teamId, audit }: { orgId: string; teamId: string; audit: import("@/lib/orgs-store").AuditEntry[] }) {
   const list = audit.filter((a) => (!a.orgId || a.orgId === orgId) && (!a.teamId || a.teamId === teamId));
+  const [showHash, setShowHash] = useState(false);
   return (
-    <div className="rounded-xl border border-border divide-y divide-border overflow-hidden bg-card">
-      {list.length === 0 && (
-        <div className="p-6 text-center text-xs text-muted-foreground">No events yet — perform actions to generate audit entries.</div>
-      )}
-      {list.map((a) => (
-        <div key={a.id} className="p-3 flex items-start gap-3">
-          <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${a.channel === "chain" ? "bg-purple-500/15 text-purple-400" : "bg-primary/10 text-primary"}`}>
-            {a.channel === "chain" ? <Shield className="w-3.5 h-3.5" /> : <ScrollText className="w-3.5 h-3.5" />}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium flex items-center gap-2 flex-wrap">
-              <span className="font-mono">{a.event}</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded border bg-secondary/60 border-border text-muted-foreground">{a.channel}</span>
-              <span className="text-[10px] text-muted-foreground">by {memberAlias(a.actorId)}</span>
-            </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{a.details}</p>
-            {a.hash && (
-              <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5 truncate">
-                hash: {a.hash}{a.prevHash ? ` ← ${a.prevHash}` : " (genesis)"}
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">{list.length} event{list.length !== 1 ? "s" : ""}</p>
+        <button
+          onClick={() => setShowHash((v) => !v)}
+          className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+        >
+          {showHash ? "Hide" : "Show"} chain hashes
+        </button>
+      </div>
+      <div className="rounded-xl border border-border divide-y divide-border overflow-hidden bg-card">
+        {list.length === 0 && (
+          <div className="p-6 text-center text-xs text-muted-foreground">No events yet.</div>
+        )}
+        {list.map((a) => (
+          <div key={a.id} className="p-3 flex items-start gap-3">
+            <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${a.channel === "chain" ? "bg-purple-500/15 text-purple-400" : "bg-primary/10 text-primary"}`}>
+              {a.channel === "chain" ? <Shield className="w-3.5 h-3.5" /> : <ScrollText className="w-3.5 h-3.5" />}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium flex items-center gap-2 flex-wrap">
+                <span>{a.event.toLowerCase().replace(/_/g, " ")}</span>
+                <span className="text-[10px] text-muted-foreground">· {memberAlias(a.actorId)}</span>
               </p>
-            )}
+              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{a.details}</p>
+              {showHash && a.hash && (
+                <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5 truncate">
+                  {a.hash.slice(0, 16)}…{a.prevHash ? ` ← ${a.prevHash.slice(0, 10)}…` : " (genesis)"}
+                </p>
+              )}
+            </div>
+            <span className="text-[10px] text-muted-foreground shrink-0">{a.ts.toLocaleTimeString()}</span>
           </div>
-          <span className="text-[10px] text-muted-foreground shrink-0">{a.ts.toLocaleTimeString()}</span>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
