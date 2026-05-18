@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Building2, Plus, Users, Key, Trash2, Eye, EyeOff, Crown,
   UserPlus, Shield, ShieldCheck, ScrollText, RefreshCw, Link2, Lock, Pencil, X, Copy, Check,
+  MoreVertical, ChevronDown,
 } from "lucide-react";
 import {
   actions, useOrgsStore, getMyRole, memberAlias,
@@ -15,6 +16,12 @@ const ROLE_COLORS: Record<Role, string> = {
   TEAM_ADMIN: "bg-blue-500/15 text-blue-400 border-blue-500/30",
   MEMBER: "bg-muted text-foreground border-border",
   VIEWER: "bg-muted/50 text-muted-foreground border-border",
+};
+const ROLE_LABEL: Record<Role, string> = {
+  ORG_ADMIN: "Org admin",
+  TEAM_ADMIN: "Team admin",
+  MEMBER: "Member",
+  VIEWER: "Viewer",
 };
 
 export default function Organizations() {
@@ -41,27 +48,55 @@ export default function Organizations() {
   const isOwner = activeOrg?.ownerId === me;
 
   return (
-    <div className="min-h-screen bg-background bg-grid text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b border-border/60 bg-card/40 backdrop-blur sticky top-0 z-30">
+      <header className="border-b border-border/60 bg-card/60 backdrop-blur sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center gap-3">
-          <button onClick={() => navigate("/vault")} className="p-2 rounded-lg hover:bg-secondary/60 transition-colors">
+          <button onClick={() => navigate("/vault")} className="p-2 -ml-2 rounded-lg hover:bg-secondary/60 transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center">
-            <Building2 className="w-4 h-4 text-primary" />
-          </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-semibold leading-none">Organizations & Teams</h1>
-            <p className="text-[11px] text-muted-foreground mt-1">Shared vaults · RBAC · ECDH-wrapped Team Keys</p>
+            <h1 className="text-sm font-semibold leading-none">Organizations</h1>
+            <p className="text-[11px] text-muted-foreground mt-1 truncate">Shared vaults & teams</p>
           </div>
           <IdentitySwitcher />
         </div>
       </header>
 
+      {/* Mobile selectors */}
+      <div className="lg:hidden border-b border-border/60 bg-card/30">
+        <div className="max-w-7xl mx-auto px-4 py-3 space-y-2">
+          <PickerRow
+            icon={Building2}
+            label="Organization"
+            items={myOrgs.map((o) => ({ id: o.id, name: o.name, badge: o.ownerId === me ? "owner" : undefined }))}
+            activeId={activeOrgId}
+            onPick={(id) => {
+              setActiveOrgId(id);
+              const org = orgs.find((o) => o.id === id);
+              setActiveTeamId(org?.teams[0]?.id ?? null);
+            }}
+            onAdd={() => setShowNewOrg(true)}
+          />
+          {activeOrg && (
+            <PickerRow
+              icon={Users}
+              label="Team"
+              items={activeOrg.teams
+                .filter((t) => getMyRole(t, me) || isOwner)
+                .map((t) => ({ id: t.id, name: t.name }))}
+              activeId={activeTeamId}
+              onPick={setActiveTeamId}
+              onAdd={isOwner || activeOrg.teams.some((t) => getMyRole(t, me) === "ORG_ADMIN") ? () => setShowNewTeam(true) : undefined}
+              emptyHint="No teams"
+            />
+          )}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-5 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-5">
-        {/* Org list */}
-        <aside className="space-y-2">
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:block space-y-2">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Organizations</h2>
             <button onClick={() => setShowNewOrg(true)} className="p-1.5 rounded-md hover:bg-secondary/60 text-primary">
@@ -111,7 +146,6 @@ export default function Organizations() {
                       }`}
                     >
                       <span className="text-sm truncate">{t.name}</span>
-                      <span className="text-[10px] text-muted-foreground font-mono">e{t.epoch}</span>
                     </button>
                   );
                 })}
@@ -161,11 +195,11 @@ export default function Organizations() {
                     }}
                   />
 
-                  <div className="flex items-center gap-1 mt-5 mb-4 border-b border-border">
+                  <div className="flex items-center gap-0 mt-5 mb-4 border-b border-border overflow-x-auto">
                     {(
                       [
                         ["shared", "Shared", Key],
-                        ["individual", "Individual", Lock],
+                        ["individual", "Personal", Lock],
                         ["members", "Members", Users],
                         ["audit", "Audit", ScrollText],
                       ] as const
@@ -173,7 +207,7 @@ export default function Organizations() {
                       <button
                         key={k}
                         onClick={() => setTab(k)}
-                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors -mb-px ${
+                        className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px whitespace-nowrap ${
                           tab === k
                             ? "border-primary text-primary"
                             : "border-transparent text-muted-foreground hover:text-foreground"
@@ -260,6 +294,59 @@ function OrgRow({ org, active, isOwner, onClick }: { org: Organization; active: 
   );
 }
 
+function PickerRow({
+  icon: Icon, label, items, activeId, onPick, onAdd, emptyHint,
+}: {
+  icon: typeof Building2;
+  label: string;
+  items: { id: string; name: string; badge?: string }[];
+  activeId: string | null;
+  onPick: (id: string) => void;
+  onAdd?: () => void;
+  emptyHint?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const active = items.find((i) => i.id === activeId);
+  return (
+    <div className="relative">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg border border-border bg-card hover:border-primary/30 transition-colors text-left min-w-0"
+        >
+          <Icon className="w-4 h-4 text-primary shrink-0" />
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</span>
+          <span className="text-sm font-medium truncate flex-1">{active?.name ?? emptyHint ?? "—"}</span>
+          {active?.badge && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
+          <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
+        {onAdd && (
+          <button onClick={onAdd} className="p-2.5 rounded-lg border border-border bg-card hover:border-primary/30 text-primary">
+            <Plus className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+      {open && (
+        <div className="absolute left-0 right-0 top-full mt-1 z-20 bg-popover border border-border rounded-lg shadow-lg p-1 max-h-64 overflow-y-auto">
+          {items.length === 0 && <p className="px-2 py-2 text-xs text-muted-foreground">{emptyHint ?? "Nothing here"}</p>}
+          {items.map((it) => (
+            <button
+              key={it.id}
+              onClick={() => { onPick(it.id); setOpen(false); }}
+              className={`w-full flex items-center gap-2 px-2 py-2 rounded text-sm text-left ${
+                it.id === activeId ? "bg-primary/10 text-primary" : "hover:bg-secondary"
+              }`}
+            >
+              <span className="truncate flex-1">{it.name}</span>
+              {it.badge && <Crown className="w-3 h-3 text-amber-400" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function OrgHeader({
   org, isOwner, myRole, onDelete, onTransfer, members,
 }: {
@@ -267,42 +354,57 @@ function OrgHeader({
   onDelete: () => void; onTransfer: (toId: string) => void;
   members: { id: string; alias: string }[];
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       className="p-4 rounded-xl border border-border bg-card/60 backdrop-blur flex items-start justify-between gap-3">
-      <div>
-        <h2 className="text-base font-semibold flex items-center gap-2">
+      <div className="min-w-0">
+        <h2 className="text-base font-semibold flex items-center gap-2 truncate">
           {org.name}
-          {isOwner && <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">Owner</span>}
+          {isOwner && <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
         </h2>
-        <p className="text-[11px] text-muted-foreground mt-1 font-mono">
-          {org.id} · owner: {memberAlias(org.ownerId)} · {org.teams.length} team{org.teams.length !== 1 ? "s" : ""}
+        <p className="text-[11px] text-muted-foreground mt-1">
+          {org.teams.length} team{org.teams.length !== 1 ? "s" : ""} · owner {memberAlias(org.ownerId)}
         </p>
       </div>
       {isOwner && (
-        <div className="flex items-center gap-1">
-          <div className="relative">
-            <button onClick={() => setTransferOpen((v) => !v)} className="px-2.5 py-1.5 rounded-md text-xs bg-secondary hover:bg-secondary/70 flex items-center gap-1.5">
-              <RefreshCw className="w-3 h-3" /> Transfer
-            </button>
-            {transferOpen && (
-              <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-border rounded-lg shadow-lg p-1 w-48">
+        <div className="relative shrink-0">
+          <button onClick={() => setMenuOpen((v) => !v)} className="p-2 rounded-md hover:bg-secondary">
+            <MoreVertical className="w-4 h-4" />
+          </button>
+          {menuOpen && (
+            <div className="absolute right-0 top-full mt-1 z-20 bg-popover border border-border rounded-lg shadow-lg p-1 w-52">
+              <button
+                onClick={() => { setTransferOpen(true); setMenuOpen(false); }}
+                className="w-full flex items-center gap-2 px-2 py-2 text-xs rounded hover:bg-secondary text-left"
+              >
+                <RefreshCw className="w-3.5 h-3.5" /> Transfer ownership
+              </button>
+              <button
+                onClick={() => { setMenuOpen(false); onDelete(); }}
+                className="w-full flex items-center gap-2 px-2 py-2 text-xs rounded hover:bg-destructive/10 text-destructive text-left"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Delete organization
+              </button>
+            </div>
+          )}
+          {transferOpen && (
+            <Modal title="Transfer ownership" onClose={() => setTransferOpen(false)}>
+              <p className="text-xs text-muted-foreground mb-2">Choose the new owner:</p>
+              <div className="space-y-1">
                 {members.filter((m) => m.id !== org.ownerId).map((m) => (
                   <button
                     key={m.id}
                     onClick={() => { onTransfer(m.id); setTransferOpen(false); }}
-                    className="w-full text-left px-2 py-1.5 text-xs rounded hover:bg-secondary"
+                    className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-secondary"
                   >
-                    Transfer to <span className="font-mono">{m.alias}</span>
+                    {m.alias}
                   </button>
                 ))}
               </div>
-            )}
-          </div>
-          <button onClick={onDelete} className="px-2.5 py-1.5 rounded-md text-xs bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center gap-1.5">
-            <Trash2 className="w-3 h-3" /> Delete
-          </button>
+            </Modal>
+          )}
         </div>
       )}
     </motion.div>
@@ -313,17 +415,16 @@ function TeamHeader({ org, team, myRole, isOwner, onDelete }: { org: Organizatio
   const canDelete = isOwner || myRole === "ORG_ADMIN";
   return (
     <div className="mt-4 flex items-center justify-between gap-3 px-1">
-      <div className="flex items-center gap-2">
-        <Users className="w-4 h-4 text-muted-foreground" />
-        <h3 className="text-sm font-medium">{team.name}</h3>
+      <div className="flex items-center gap-2 min-w-0">
+        <Users className="w-4 h-4 text-muted-foreground shrink-0" />
+        <h3 className="text-sm font-medium truncate">{team.name}</h3>
         {myRole && (
-          <span className={`text-[10px] px-1.5 py-0.5 rounded border ${ROLE_COLORS[myRole]}`}>{myRole}</span>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded border shrink-0 ${ROLE_COLORS[myRole]}`}>{ROLE_LABEL[myRole]}</span>
         )}
-        <span className="text-[10px] text-muted-foreground font-mono">epoch {team.epoch}</span>
       </div>
       {canDelete && (
-        <button onClick={onDelete} className="text-xs text-destructive hover:underline flex items-center gap-1">
-          <Trash2 className="w-3 h-3" /> Delete team
+        <button onClick={onDelete} className="p-1.5 rounded hover:bg-destructive/10 text-destructive shrink-0" title="Delete team">
+          <Trash2 className="w-3.5 h-3.5" />
         </button>
       )}
     </div>
@@ -355,7 +456,7 @@ function MembersTab({ org, team, myRole }: { org: Organization; team: Team; myRo
     <div className="space-y-3">
       {canManage && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">{team.memberships.length} member(s) — Team Key wrapped via ECDH per member</p>
+          <p className="text-xs text-muted-foreground">{team.memberships.length} member{team.memberships.length !== 1 ? "s" : ""}</p>
           <button
             onClick={() => setInviteOpen((v) => !v)}
             disabled={available.length === 0}
@@ -399,10 +500,10 @@ function MembersTab({ org, team, myRole }: { org: Organization; team: Team; myRo
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm flex items-center gap-2">
-                  <span className="font-mono">{member?.alias}</span>
+                  <span>{member?.alias}</span>
                   {isMe && <span className="text-[10px] text-primary">(you)</span>}
                 </p>
-                <p className="text-[10px] text-muted-foreground font-mono truncate">wrap: {m.wrappedKey.slice(0, 28)}…</p>
+                <p className="text-[10px] text-muted-foreground truncate">{ROLE_LABEL[m.role]}</p>
               </div>
               {canManage && roleOptions.length > 0 ? (
                 <select
@@ -411,12 +512,12 @@ function MembersTab({ org, team, myRole }: { org: Organization; team: Team; myRo
                   className="bg-secondary border border-border rounded px-1.5 py-1 text-[11px]"
                 >
                   {roleOptions.map((r) => (
-                    <option key={r} value={r}>{r}</option>
+                    <option key={r} value={r}>{ROLE_LABEL[r]}</option>
                   ))}
-                  {!roleOptions.includes(m.role) && <option value={m.role}>{m.role}</option>}
+                  {!roleOptions.includes(m.role) && <option value={m.role}>{ROLE_LABEL[m.role]}</option>}
                 </select>
               ) : (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${ROLE_COLORS[m.role]}`}>{m.role}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${ROLE_COLORS[m.role]}`}>{ROLE_LABEL[m.role]}</span>
               )}
               {(canManage || isMe) && (
                 <button
@@ -645,32 +746,43 @@ function CredentialRow({ org, team, cred, myRole }: { org: Organization; team: T
 
 function AuditTab({ orgId, teamId, audit }: { orgId: string; teamId: string; audit: import("@/lib/orgs-store").AuditEntry[] }) {
   const list = audit.filter((a) => (!a.orgId || a.orgId === orgId) && (!a.teamId || a.teamId === teamId));
+  const [showHash, setShowHash] = useState(false);
   return (
-    <div className="rounded-xl border border-border divide-y divide-border overflow-hidden bg-card">
-      {list.length === 0 && (
-        <div className="p-6 text-center text-xs text-muted-foreground">No events yet — perform actions to generate audit entries.</div>
-      )}
-      {list.map((a) => (
-        <div key={a.id} className="p-3 flex items-start gap-3">
-          <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${a.channel === "chain" ? "bg-purple-500/15 text-purple-400" : "bg-primary/10 text-primary"}`}>
-            {a.channel === "chain" ? <Shield className="w-3.5 h-3.5" /> : <ScrollText className="w-3.5 h-3.5" />}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium flex items-center gap-2 flex-wrap">
-              <span className="font-mono">{a.event}</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded border bg-secondary/60 border-border text-muted-foreground">{a.channel}</span>
-              <span className="text-[10px] text-muted-foreground">by {memberAlias(a.actorId)}</span>
-            </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{a.details}</p>
-            {a.hash && (
-              <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5 truncate">
-                hash: {a.hash}{a.prevHash ? ` ← ${a.prevHash}` : " (genesis)"}
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">{list.length} event{list.length !== 1 ? "s" : ""}</p>
+        <button
+          onClick={() => setShowHash((v) => !v)}
+          className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+        >
+          {showHash ? "Hide" : "Show"} chain hashes
+        </button>
+      </div>
+      <div className="rounded-xl border border-border divide-y divide-border overflow-hidden bg-card">
+        {list.length === 0 && (
+          <div className="p-6 text-center text-xs text-muted-foreground">No events yet.</div>
+        )}
+        {list.map((a) => (
+          <div key={a.id} className="p-3 flex items-start gap-3">
+            <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${a.channel === "chain" ? "bg-purple-500/15 text-purple-400" : "bg-primary/10 text-primary"}`}>
+              {a.channel === "chain" ? <Shield className="w-3.5 h-3.5" /> : <ScrollText className="w-3.5 h-3.5" />}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium flex items-center gap-2 flex-wrap">
+                <span>{a.event.toLowerCase().replace(/_/g, " ")}</span>
+                <span className="text-[10px] text-muted-foreground">· {memberAlias(a.actorId)}</span>
               </p>
-            )}
+              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{a.details}</p>
+              {showHash && a.hash && (
+                <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5 truncate">
+                  {a.hash.slice(0, 16)}…{a.prevHash ? ` ← ${a.prevHash.slice(0, 10)}…` : " (genesis)"}
+                </p>
+              )}
+            </div>
+            <span className="text-[10px] text-muted-foreground shrink-0">{a.ts.toLocaleTimeString()}</span>
           </div>
-          <span className="text-[10px] text-muted-foreground shrink-0">{a.ts.toLocaleTimeString()}</span>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
