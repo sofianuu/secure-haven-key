@@ -454,9 +454,9 @@ function MembersTab({ org, team, myRole }: { org: Organization; team: Team; myRo
 
   return (
     <div className="space-y-3">
-      {canManage && (
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">{team.memberships.length} member(s) — Team Key wrapped via ECDH per member</p>
+        {canManage && (
+          <p className="text-xs text-muted-foreground">{team.memberships.length} member{team.memberships.length !== 1 ? "s" : ""}</p>
+        )}
           <button
             onClick={() => setInviteOpen((v) => !v)}
             disabled={available.length === 0}
